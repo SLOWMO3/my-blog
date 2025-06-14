@@ -7,13 +7,13 @@ import type { Database } from '@/types/database.types';
 type Comment = Database['public']['Tables']['comments']['Row'];
 
 // 댓글 수정 (PUT)
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
-    const commentId = params.id;
+    const commentId = context.params.id;
     const body = await request.json();
     const { content } = body;
     if (!content || content.trim().length < 1) {
@@ -58,13 +58,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // 댓글 삭제 (DELETE)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
-    const commentId = params.id;
+    const commentId = context.params.id;
     const supabase = await createServerSupabaseClient();
     // 댓글 존재 및 권한 확인
     const { data: comment, error: getError } = await supabase
