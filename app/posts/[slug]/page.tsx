@@ -71,72 +71,50 @@ export async function generateStaticParams() {
 // 동적 메타데이터 생성 함수
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug: rawSlug } = await params;
-  // URL 디코딩 처리
   const slug = decodeURIComponent(rawSlug);
-  
   try {
-    console.log('=== 메타데이터 생성 시작 ===', slug);
-    
     // 빌드 타임에는 인증 없이 공개 데이터만 조회
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    
     const { data: post, error } = await supabase
       .from('posts')
       .select(`
-        id,
-        title,
-        content,
-        excerpt,
-        slug,
-        cover_image_url,
-        created_at,
-        updated_at,
-        author_id,
-        categories (
-          id,
-          name,
-          slug
-        )
+        id, title, content, excerpt, slug, cover_image_url, created_at, updated_at, author_id, status,
+        categories (id, name, slug)
       `)
       .eq('slug', slug)
       .eq('status', 'published')
       .single();
-  
     if (error || !post) {
-      console.log('❌ 메타데이터 생성 실패: 게시물 없음');
       return {
         title: '포스트를 찾을 수 없습니다 | My Blog',
         description: '요청하신 포스트를 찾을 수 없습니다.',
       };
     }
-
-    // 카테고리 정보 추출
-    const categoryData = Array.isArray(post.categories) && post.categories.length > 0 
-      ? post.categories[0] 
-      : null;
-
-    // 새로운 메타데이터 유틸리티 함수 사용
-    const metadata = generatePostMetadata({
+    let categoryName: string | undefined = undefined;
+    if (Array.isArray(post.categories) && post.categories.length > 0) {
+      categoryName = post.categories[0]?.name;
+    } else if (post.categories && typeof post.categories === 'object' && 'name' in post.categories) {
+      categoryName = (post.categories as { name?: string }).name;
+    }
+    // 메타데이터 유틸리티 함수 사용
+    const meta = generatePostMetadata({
       title: post.title,
       content: post.content || '',
-      excerpt: post.excerpt || undefined,
       slug: post.slug,
       coverImageUrl: post.cover_image_url,
       createdAt: post.created_at,
       updatedAt: post.updated_at,
-      categoryName: categoryData?.name,
-      authorName: '작성자', // 추후 Clerk에서 실제 작성자 정보 가져올 예정
+      categoryName,
+      authorName: '작성자',
+      excerpt: post.excerpt,
     });
-
-    console.log('✅ 고급 메타데이터 생성 완료:', post.title);
-    return metadata;
-
+    // JSON-LD는 별도 script 태그로 삽입 필요(페이지 내에서 처리)
+    return meta;
   } catch (error) {
-    console.error('메타데이터 생성 중 오류 발생:', error);
     return {
       title: '포스트를 찾을 수 없습니다 | My Blog',
       description: '포스트를 불러오는 중 오류가 발생했습니다.',
@@ -408,4 +386,4 @@ export default async function PostDetailPage({ params }: PageProps) {
     console.error('게시물 조회 중 오류 발생:', error);
     notFound();
   }
-} 
+}

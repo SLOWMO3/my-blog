@@ -29,10 +29,10 @@ interface NavItem {
 
 // 네비게이션 메뉴 목록
 const navItems: NavItem[] = [
-  { name: '홈', href: '/', description: '메인 페이지로 이동' },
-  { name: '블로그', href: '/posts', description: '블로그 글 목록 보기' },
-  { name: '카테고리', href: '/categories', description: '카테고리별 글 보기' },
-  { name: '소개', href: '/about', description: '블로그 소개 보기' },
+  { name: '홈', href: '/', description: '세계 음식 블로그 메인으로 이동' },
+  { name: '음식 이야기', href: '/posts', description: '세계 음식/문화/여행 이야기 모아보기' },
+  { name: '카테고리', href: '/categories', description: '음식 종류별로 탐색하기' },
+  { name: '소개', href: '/about', description: '블로그와 운영자 소개' },
 ];
 
 export default function Header() {
@@ -69,14 +69,14 @@ export default function Header() {
             <Link 
               href="/" 
               className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
-              aria-label="홈페이지로 이동"
+              aria-label="세계 음식 블로그 메인으로 이동"
             >
-              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg" aria-hidden="true">
-                  B
+              <div className="h-8 w-8 rounded-md bg-amber-500 flex items-center justify-center">
+                <span className="text-white font-bold text-lg" aria-hidden="true">
+                  🍽️
                 </span>
               </div>
-              <span className="font-bold text-xl">My Blog</span>
+              <span className="font-bold text-xl text-amber-700">세계 음식 블로그</span>
             </Link>
           </div>
 
@@ -108,7 +108,7 @@ export default function Header() {
               >
                 <Link href="/admin/posts/create">
                   <PlusCircle className="h-4 w-4" />
-                  새 글 작성
+                  음식글 작성
                 </Link>
               </Button>
               
@@ -152,9 +152,9 @@ export default function Header() {
                 
                 <SheetContent side="right" className="w-80">
                   <SheetHeader>
-                    <SheetTitle>네비게이션 메뉴</SheetTitle>
+                    <SheetTitle>음식/여행 메뉴</SheetTitle>
                     <SheetDescription>
-                      원하는 페이지로 이동하세요.
+                      세계의 다양한 음식과 문화를 탐험하세요.
                     </SheetDescription>
                   </SheetHeader>
                   
@@ -207,10 +207,10 @@ export default function Header() {
                         <Link
                           href="/admin/posts/create"
                           onClick={closeMobileMenu}
-                          aria-label="새 글 작성"
+                          aria-label="음식글 작성"
                         >
                           <PlusCircle className="h-4 w-4 mr-2" />
-                          새 글 작성
+                          음식글 작성
                         </Link>
                       </Button>
                     </div>
@@ -255,4 +255,4 @@ export default function Header() {
       </header>
     </>
   );
-} 
+}

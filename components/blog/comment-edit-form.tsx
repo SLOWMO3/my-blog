@@ -3,29 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Database } from '@/types/database.types';
-
-// 데이터베이스 기반 댓글 타입 정의
-type Comment = Database['public']['Tables']['comments']['Row'];
-
-// API 응답을 프론트엔드 타입으로 변환하는 함수
-const convertCommentFromApi = (apiComment: any): Comment => {
-  return {
-    id: apiComment.id,
-    content: apiComment.content,
-    user_id: apiComment.user_id,
-    user_name: apiComment.user_name,
-    user_email: apiComment.user_email,
-    post_id: apiComment.post_id,
-    parent_id: apiComment.parent_id,
-    created_at: apiComment.created_at,
-    updated_at: apiComment.updated_at,
-  };
-};
+import type { Comment as ApiComment } from '@/types/comment';
 
 interface CommentEditFormProps {
-  comment: Comment;
-  onSave: (updatedComment: Comment) => void;
+  comment: ApiComment;
+  onSave: (updatedComment: ApiComment) => void;
   onCancel: () => void;
 }
 
@@ -87,9 +69,7 @@ export default function CommentEditForm({ comment, onSave, onCancel }: CommentEd
   };
   // 댓글 저장 처리
   const handleSave = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     // 내용이 변경되지 않았으면 취소
     if (content.trim() === comment.content) {
@@ -99,34 +79,21 @@ export default function CommentEditForm({ comment, onSave, onCancel }: CommentEd
 
     setIsSubmitting(true);
     setError(null);
-
     try {
-      // PUT API 호출로 댓글 수정
       const response = await fetch(`/api/comments/${comment.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: content.trim(),
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content.trim() }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || '댓글 수정에 실패했습니다.');
       }
-
       const { comment: updatedComment } = await response.json();
-      
-      // API 응답을 프론트엔드 타입으로 변환
-      const convertedComment = convertCommentFromApi(updatedComment);
-      
-      // 부모 컴포넌트에 수정된 댓글 전달
-      onSave(convertedComment);
-      
+
+      // 이미 프론트엔드 타입으로 변환된 상태로 가정
+      onSave(updatedComment);
     } catch (error) {
-      console.error('댓글 수정 오류:', error);
       setError(error instanceof Error ? error.message : '댓글 수정 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);

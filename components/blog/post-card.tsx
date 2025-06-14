@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * 블로그 포스트 카드 컴포넌트
- * 포스트 목록에서 개별 포스트를 표시하는 재사용 가능한 컴포넌트
+ * World Food Explorer 카드 컴포넌트
+ * 세계 각국의 음식, 레시피, 음식 문화, 여행기를 소개하는 블로그 카드
  */
 
 import Link from 'next/link';
@@ -78,24 +78,22 @@ export function PostCard({
 }: PostCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  // 변형에 따른 이미지 높이 설정
+  // 음식 테마에 맞는 이미지 높이/타이틀 크기
   const imageHeight = {
     default: 'h-48',
     featured: 'h-56',
-    compact: 'h-40'
+    compact: 'h-40',
   }[variant];
-
-  // 변형에 따른 제목 크기 설정
   const titleSize = {
     default: 'text-xl',
     featured: 'text-2xl',
-    compact: 'text-lg'
+    compact: 'text-lg',
   }[variant];
 
   return (
     <Card className={`group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${className}`}>
       <article className="relative h-full">
-        {/* 커버 이미지 */}
+        {/* 음식 커버 이미지 */}
         <div className={`relative ${imageHeight} overflow-hidden`}>
           {post.coverImage && !imageError ? (
             <Image
@@ -108,87 +106,71 @@ export function PostCard({
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-600/20 flex items-center justify-center">
-              <div className="text-4xl opacity-60">📝</div>
+            <div className="w-full h-full bg-gradient-to-br from-yellow-100 to-orange-200 flex items-center justify-center">
+              <div className="text-4xl opacity-70">🌍🍽️</div>
             </div>
           )}
-
-          {/* 추천 포스트 배지 */}
+          {/* 인기 레시피/추천 음식 배지 */}
           {post.featured && (
             <div className="absolute top-3 left-3">
-              <span className="px-2 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                ⭐ 추천
+              <span className="px-2 py-1 bg-orange-500 text-white text-xs font-medium rounded-full">
+                🏆 세계 인기 레시피
               </span>
             </div>
           )}
-          
-          {/* 검색 결과 배지 */}
+          {/* 음식 검색 결과 배지 */}
           {searchQuery && (
             <div className="absolute top-3 right-3">
               <span className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
-                🔍 검색 결과
+                🔍 음식/국가 검색 결과
               </span>
             </div>
           )}
         </div>
-
         <CardContent className="p-6 flex flex-col h-full">
-          {/* 메타 정보 */}
+          {/* 음식/국가/카테고리/발행일 등 메타 정보 */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 flex-wrap">
-            {/* 카테고리 */}
             {showCategory && (
               <>
                 <Link
                   href={`/categories/${post.category.slug}`}
-                  className="inline-flex items-center hover:text-primary transition-colors"
+                  className="inline-flex items-center hover:text-orange-600 transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <span 
-                    className="px-2 py-1 rounded text-xs font-medium hover:opacity-80 transition-opacity"
-                    style={{ 
-                      backgroundColor: post.category.color + '15',
-                      color: post.category.color 
-                    }}
+                    className="px-2 py-1 rounded text-xs font-medium hover:opacity-80 transition-opacity bg-yellow-50 text-orange-700"
                   >
-                    {post.category.name}
+                    🍲 {post.category.name}
                   </span>
                 </Link>
                 <span>•</span>
               </>
             )}
-            
-            {/* 읽기 시간 */}
             <span className="flex items-center gap-1">
-              <span>📖</span>
-              {post.readingTime}분 읽기
+              <span>⏱️</span>
+              {post.readingTime}분 레시피
             </span>
-            
             <span>•</span>
-            
-            {/* 발행일 */}
             <time dateTime={new Date(post.publishedAt).toISOString()}>
               {getRelativeTime(new Date(post.publishedAt))}
             </time>
           </div>
-
-          {/* 제목 (검색어 하이라이팅 적용) */}
-          <h3 className={`${titleSize} font-bold mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-tight`}>
+          {/* 음식/국가명(제목) */}
+          <h3 className={`${titleSize} font-bold mb-3 line-clamp-2 group-hover:text-orange-600 transition-colors leading-tight`}>
             {highlightSearchTerm(post.title, searchQuery)}
           </h3>
-
-          {/* 요약 (검색어 하이라이팅 적용) */}
-          <p className="text-muted-foreground mb-4 line-clamp-3 leading-relaxed text-sm flex-grow">
-            {highlightSearchTerm(post.excerpt, searchQuery)}
+          {/* 음식 설명/요약 */}
+          <p className="text-orange-900/80 mb-4 line-clamp-3 leading-relaxed text-sm flex-grow">
+            {highlightSearchTerm(post.excerpt || '세계 각국의 음식, 레시피, 음식 문화와 여행기를 소개합니다. 다양한 나라의 맛과 이야기를 경험해보세요!', searchQuery)}
           </p>
-
-          {/* 태그 (검색어 하이라이팅 적용) */}
+          {/* 음식 태그 */}
           {showTags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-4">
               {post.tags.slice(0, maxTags).map((tag) => (
                 <Link
                   key={tag}
                   href={`/tags/${encodeURIComponent(tag)}`}
-                  className="px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 transition-colors"
+                  className="px-2 py-1 text-xs bg-yellow-100 text-orange-700 rounded hover:bg-yellow-200 transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
                   #{highlightSearchTerm(tag, searchQuery)}
@@ -201,7 +183,6 @@ export function PostCard({
               )}
             </div>
           )}
-
           {/* 하단 정보 */}
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/50">
             {/* 왼쪽: 작성자 정보 */}
@@ -216,18 +197,17 @@ export function PostCard({
                     className="rounded-full"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium">
+                  <div className="w-6 h-6 rounded-full bg-orange-200 flex items-center justify-center text-xs font-medium">
                     {post.author.name[0]}
                   </div>
                 )}
-                <span className="text-sm text-muted-foreground font-medium">
+                <span className="text-sm text-orange-700 font-medium">
                   {post.author.name}
                 </span>
               </div>
             )}
-
             {/* 오른쪽: 통계 정보 및 좋아요 버튼 */}
-            <div className="flex items-center gap-3">              {/* 통계 정보 (조회수만) */}
+            <div className="flex items-center gap-3">
               {showStats && (
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -235,7 +215,7 @@ export function PostCard({
                     {(post.viewCount || 0).toLocaleString()}
                   </span>
                 </div>
-              )}{/* 좋아요 버튼 */}
+              )}
               {showLikeButton && (
                 <div onClick={(e) => e.stopPropagation()}>
                   <LikeButton
@@ -249,12 +229,11 @@ export function PostCard({
             </div>
           </div>
         </CardContent>
-
         {/* 전체 카드 링크 */}
         <Link
           href={`/posts/${post.slug}`}
           className="absolute inset-0 z-10"
-          aria-label={`${post.title} 포스트 읽기`}
+          aria-label={`${post.title} 세계 음식 포스트 읽기`}
         />
       </article>
     </Card>
@@ -307,4 +286,4 @@ export function RelatedPostCard({ post, ...props }: Omit<PostCardProps, 'variant
       {...props}
     />
   );
-} 
+}

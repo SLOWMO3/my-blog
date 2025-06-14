@@ -15,10 +15,10 @@ interface FooterLink {
 
 // 푸터 네비게이션 링크들
 const footerLinks: FooterLink[] = [
-  { name: '소개', href: '/about', description: '블로그 소개 보기' },
+  { name: '소개', href: '/about', description: '세계 음식 블로그 소개' },
   { name: '개인정보처리방침', href: '/privacy', description: '개인정보 보호정책' },
   { name: '이용약관', href: '/terms', description: '서비스 이용약관' },
-  { name: '연락처', href: '/contact', description: '문의하기' },
+  { name: '연락처', href: '/contact', description: '블로그 문의하기' },
 ];
 
 export default function Footer() {
@@ -36,21 +36,21 @@ export default function Footer() {
           <div className="flex flex-col items-center space-y-3 md:items-start">
             {/* 브랜드 로고 및 이름 */}
             <div className="flex items-center space-x-2">
-              <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm" aria-hidden="true">
-                  B
+              <div className="h-7 w-7 rounded-md bg-amber-500 flex items-center justify-center">
+                <span className="text-white font-bold text-sm" aria-hidden="true">
+                  🍽️
                 </span>
               </div>
-              <span className="font-bold text-lg">My Blog</span>
+              <span className="font-bold text-lg text-amber-700">세계 음식 블로그</span>
             </div>
             
             {/* 저작권 정보 */}
             <div className="text-center md:text-left">
               <p className="text-sm text-muted-foreground">
-                © {currentYear} <span className="font-medium">My Blog</span>. All rights reserved.
+                © {currentYear} <span className="font-medium">세계 음식 블로그</span>. All rights reserved.
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                웹 개발 기술 블로그 • Built with Next.js
+                세계의 다양한 음식과 문화를 소개합니다 • Built with Next.js
               </p>
             </div>
           </div>
@@ -108,4 +108,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}

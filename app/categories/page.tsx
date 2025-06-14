@@ -17,11 +17,11 @@ type Category = Database['public']['Tables']['categories']['Row'];
 
 // 페이지 메타데이터
 export const metadata: Metadata = {
-  title: '카테고리 | My Blog',
-  description: '블로그의 모든 카테고리를 확인하고 관심 있는 주제의 글을 찾아보세요.',
+  title: '음식 카테고리 | 세계 음식 블로그',
+  description: '세계 각국의 음식 카테고리를 탐험하고, 다양한 미식 경험과 문화를 만나보세요.',
   openGraph: {
-    title: '카테고리 | My Blog',
-    description: '블로그의 모든 카테고리를 확인하고 관심 있는 주제의 글을 찾아보세요.',
+    title: '음식 카테고리 | 세계 음식 블로그',
+    description: '세계 각국의 음식 카테고리를 탐험하고, 다양한 미식 경험과 문화를 만나보세요.',
   },
 };
 
@@ -38,6 +38,7 @@ export default async function CategoriesPage() {
     const { data: categories, error: categoriesError } = await supabase
       .from('categories')
       .select('*')
+      .in('slug', ['korean', 'chinese', 'western', 'japanese'])
       .order('name');
 
     if (categoriesError) {
@@ -60,7 +61,13 @@ export default async function CategoriesPage() {
           id: category.id,
           name: category.name,
           slug: category.slug,
-          description: category.description || `${category.name} 관련 글들을 모아놓은 카테고리입니다.`,
+          description: (
+            category.slug === 'korean' ? '한식의 다양한 음식과 레시피, 전통과 현대의 맛을 소개합니다.' :
+            category.slug === 'chinese' ? '중국 각지의 요리와 음식 문화, 인기 중식 레시피를 만나보세요.' :
+            category.slug === 'western' ? '유럽, 미국 등 서양의 다양한 음식과 레스토랑, 미식 트렌드를 소개합니다.' :
+            category.slug === 'japanese' ? '일본의 전통과 현대 요리, 인기 일식 레시피와 음식 문화를 탐험하세요.' :
+            category.description || `${category.name} 관련 글들을 모아놓은 카테고리입니다.`
+          ),
           postCount: count || 0,
           color: category.color || '#3b82f6' // 데이터베이스의 color 컬럼 사용
         };
@@ -69,8 +76,15 @@ export default async function CategoriesPage() {
 
     console.log('✅ 카테고리별 게시물 수 조회 완료');
 
+    // 카테고리 목록 렌더링 부분(본문 상단에 안내문구 추가)
     return (
-      <div className="py-16">
+      <div className="max-w-4xl mx-auto py-12">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 flex items-center gap-2">🌶️ 음식 카테고리</h1>
+        <p className="text-muted-foreground mb-8 text-base">
+          세계 각국의 다양한 음식 카테고리를 탐험하세요!<br />
+          한식, 중식, 일식, 유럽, 중동, 남미 등 다양한 미식 문화와 레시피, 여행 팁까지 한눈에 볼 수 있습니다.
+        </p>
+
         {/* 페이지 헤더 */}
         <section className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -219,4 +233,4 @@ export default async function CategoriesPage() {
       </div>
     );
   }
-} 
+}

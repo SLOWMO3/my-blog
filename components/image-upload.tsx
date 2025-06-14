@@ -232,6 +232,7 @@ export default function ImageUpload({
         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
         onChange={handleFileChange}
         className="hidden"
+        title="이미지 파일 선택"
       />
 
       {/* 미리보기 영역 */}

@@ -5,42 +5,36 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { CalendarDays, Heart, MessageSquare, Flag, Pencil, Trash2 } from 'lucide-react';
-import { Database } from '@/types/database.types';
 import CommentEditForm from './comment-edit-form';
-
-// 데이터베이스 기반 댓글 타입 정의
-type Comment = Database['public']['Tables']['comments']['Row'];
+import type { Comment as ApiComment } from '@/types/comment';
 
 interface CommentItemProps {
-  comment: Comment;
-  isEditing?: boolean;
-  onReply?: (commentId: string) => void;
-  onLike?: (commentId: string) => void;
-  onReport?: (commentId: string) => void;
-  onEdit?: (commentId: string) => void;
-  onDelete?: (commentId: string) => void;
-  onUpdate?: (updatedComment: Comment) => void;
-  onEditCancel?: () => void;
+  comment: ApiComment & { isMine?: boolean };
+  isEditing: boolean;
+  onEdit: () => void;
+  onEditSave: (updated: ApiComment) => void;
+  onEditCancel: () => void;
+  onDelete: () => void;
+  onReport?: (id: string) => void;
 }
 
 /**
  * 개별 댓글 아이템 컴포넌트
  * 댓글의 모든 정보를 표시하고 기본적인 액션들을 제공합니다.
  */
-export default function CommentItem({ 
-  comment, 
-  isEditing = false,
-  onReply, 
-  onLike, 
-  onReport,
+export default function CommentItem({
+  comment,
+  isEditing,
   onEdit,
   onDelete,
-  onUpdate,
-  onEditCancel 
+  onEditSave,
+  onEditCancel,
+  onReport,
 }: CommentItemProps) {
+  // Clerk 인증 정보
   const { user } = useUser();
-  const isAuthor = user?.id === comment.user_id;
-  
+  const isAuthor = comment.isMine ?? (user?.id && comment.userId === user.id);
+
   /**
    * 이니셜 생성 함수 (한글/영문 모두 지원)
    * @param name 작성자 이름
@@ -134,25 +128,13 @@ export default function CommentItem({
       </span>
     ));
   };
-  /**
-   * 편집 시작 핸들러
-   */
-  const handleEdit = () => {
-    onEdit?.(comment.id);
-  };
 
-  /**
-   * 편집 취소 핸들러
-   */
-  const handleEditCancel = () => {
-    onEditCancel?.();
+  // 좋아요/답글 핸들러는 실제 기능 없이 UI만 제공
+  const onLike = (id: string) => {
+    // TODO: 좋아요 기능 구현 예정
   };
-
-  /**
-   * 편집 저장 핸들러
-   */
-  const handleEditSave = (updatedComment: Comment) => {
-    onUpdate?.(updatedComment);
+  const onReply = (id: string) => {
+    // TODO: 답글 기능 구현 예정
   };
 
   return (
@@ -162,9 +144,9 @@ export default function CommentItem({
           <Avatar className="w-10 h-10">
             {/* Database에는 아바타 이미지 URL이 없으므로 이니셜만 표시 */}
             <AvatarFallback 
-              className={`${getAvatarColor(comment.user_name || '익명')} text-sm font-semibold`}
+              className={`${getAvatarColor(comment.authorName || '익명')} text-sm font-semibold`}
             >
-              {getInitials(comment.user_name || '익명')}
+              {getInitials(comment.authorName || '익명')}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -173,7 +155,7 @@ export default function CommentItem({
         <div className="flex-1 min-w-0">          {/* 작성자 정보 헤더 */}
           <div className="flex items-center flex-wrap gap-2 mb-2">
             <span className="font-semibold text-gray-900">
-              {comment.user_name || '익명'}
+              {comment.authorName || '익명'}
             </span>
             
             {/* 배지들 */}
@@ -186,14 +168,14 @@ export default function CommentItem({
             {/* 작성 시간 */}
             <span className="text-gray-500 text-sm flex items-center gap-1">
               <CalendarDays className="w-3 h-3" />
-              {formatRelativeTime(new Date(comment.created_at))}
+              {formatRelativeTime(new Date(comment.createdAt))}
             </span>
           </div>          {/* 댓글 내용 또는 편집 폼 */}
           {isEditing ? (
             <CommentEditForm
               comment={comment}
-              onSave={handleEditSave}
-              onCancel={handleEditCancel}
+              onSave={onEditSave}
+              onCancel={onEditCancel}
             />
           ) : (
             <div className="text-gray-700 leading-relaxed mb-3 whitespace-pre-wrap">
@@ -231,7 +213,7 @@ export default function CommentItem({
                   variant="ghost"
                   size="sm"
                   className="h-auto p-1 text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-colors"
-                  onClick={handleEdit}
+                  onClick={onEdit}
                 >
                   <Pencil className="w-4 h-4 mr-1" />
                   <span className="text-xs">수정</span>
@@ -260,7 +242,7 @@ export default function CommentItem({
                       <AlertDialogCancel>취소</AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-red-500 hover:bg-red-600"
-                        onClick={() => onDelete?.(comment.id)}
+                        onClick={() => onDelete?.()}
                       >
                         삭제
                       </AlertDialogAction>
@@ -285,4 +267,4 @@ export default function CommentItem({
       </div>
     </div>
   );
-} 
+}

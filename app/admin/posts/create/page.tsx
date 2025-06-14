@@ -298,9 +298,10 @@ export default function CreatePostPage() {
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   <span className="text-sm text-muted-foreground">카테고리 로딩 중...</span>
                 </div>
-              ) : (                <Select
+              ) : (
+                <Select
                   value={formData.category_id?.toString() || 'none'}
-                  onValueChange={(value) => setFormData(prev => ({
+                  onValueChange={(value: string) => setFormData(prev => ({
                     ...prev,
                     category_id: value === 'none' ? null : value
                   }))}
@@ -310,7 +311,7 @@ export default function CreatePostPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">카테고리 없음</SelectItem>
-                    {categories.map((category) => (
+                    {categories.map((category: Category) => (
                       <SelectItem key={category.id} value={category.id.toString()}>
                         <div className="flex items-center gap-2">
                           <div 

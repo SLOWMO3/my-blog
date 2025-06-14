@@ -60,74 +60,64 @@ export async function GET(request: Request) {
 
 /**
  * 좋아요 토글 (POST)
- * - 인증된 사용자만 가능
- * - 이미 좋아요면 삭제, 아니면 추가
+ * - 인증된 사용자만 접근 가능
+ * - 이미 좋아요가 있으면 제거, 없으면 추가
  * - 중복 좋아요 방지
+ * - { liked, totalLikes } 반환
  */
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: '좋아요를 하려면 로그인이 필요합니다' }, { status: 401 });
+      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
     }
-    const body = await request.json();
-    const { postId } = body;
+    const { postId } = await request.json();
     if (!postId) {
-      return NextResponse.json({ error: '게시글 ID가 필요합니다' }, { status: 400 });
+      return NextResponse.json({ error: '게시글 ID가 필요합니다.' }, { status: 400 });
     }
     const supabase = await createServerSupabaseClient();
-
-    // 이미 좋아요가 있는지 확인
-    const { data: likeData, error: likeError } = await supabase
+    // 좋아요 존재 여부 확인
+    const { data: existing, error: findError } = await supabase
       .from('likes')
       .select('id')
       .eq('post_id', postId)
       .eq('user_id', userId)
       .maybeSingle();
-    if (likeError) {
-      console.error('좋아요 중복 확인 오류:', likeError);
-      return NextResponse.json({ error: '좋아요 처리 중 오류가 발생했습니다' }, { status: 500 });
+    if (findError && findError.code !== 'PGRST116') {
+      return NextResponse.json({ error: '좋아요 상태 확인 실패' }, { status: 500 });
     }
-
     let liked = false;
-    // 트랜잭션처럼 처리 (실제 트랜잭션은 Supabase 서버에서만 지원)
-    if (likeData) {
+    if (existing) {
       // 이미 좋아요 → 삭제
       const { error: deleteError } = await supabase
         .from('likes')
         .delete()
-        .eq('id', likeData.id);
+        .eq('id', existing.id);
       if (deleteError) {
-        console.error('좋아요 삭제 오류:', deleteError);
-        return NextResponse.json({ error: '좋아요 취소 중 오류가 발생했습니다' }, { status: 500 });
+        return NextResponse.json({ error: '좋아요 취소 실패' }, { status: 500 });
       }
       liked = false;
     } else {
-      // 좋아요 없음 → 추가
+      // 좋아요 추가
       const { error: insertError } = await supabase
         .from('likes')
-        .insert([{ post_id: postId, user_id: userId }]);
+        .insert({ post_id: postId, user_id: userId });
       if (insertError) {
-        // unique constraint 위반 등
-        console.error('좋아요 추가 오류:', insertError);
-        return NextResponse.json({ error: '좋아요 추가 중 오류가 발생했습니다' }, { status: 500 });
+        return NextResponse.json({ error: '좋아요 추가 실패' }, { status: 500 });
       }
       liked = true;
     }
-
     // 최종 좋아요 수 재조회
     const { count, error: countError } = await supabase
       .from('likes')
       .select('id', { count: 'exact', head: true })
       .eq('post_id', postId);
     if (countError) {
-      console.error('최종 좋아요 수 조회 오류:', countError);
-      return NextResponse.json({ error: '좋아요 수를 불러오는 중 오류가 발생했습니다' }, { status: 500 });
+      return NextResponse.json({ error: '좋아요 수 조회 실패' }, { status: 500 });
     }
-
     return NextResponse.json({ liked, totalLikes: count ?? 0 });
   } catch (error) {
     console.error('좋아요 토글 오류:', error);
-    return NextResponse.json({ error: '좋아요 처리 중 오류가 발생했습니다' }, { status: 500 });
+    return NextResponse.json({ error: '좋아요 처리 중 오류가 발생했습니다.' }, { status: 500 });
   }
-} 
+}

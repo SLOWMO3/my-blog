@@ -126,27 +126,27 @@ export default async function Home() {
       {/* Hero 섹션 */}
       <section className="text-center mb-20">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Welcome to My Blog
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-amber-500 via-red-400 to-green-500 bg-clip-text text-transparent">
+            세계 음식 여행 블로그에 오신 것을 환영합니다! 🍽️🌏
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            웹 개발, JavaScript, React, Next.js에 관한 최신 기술과 실무 경험을 공유합니다. 
-            함께 성장하는 개발자가 되어보세요.
+            전 세계의 다양한 음식과 식문화를 소개합니다. 각국의 대표 요리, 숨은 맛집, 음식에 얽힌 이야기와 여행 팁까지! <br />
+            새로운 미식 경험과 문화를 함께 탐험해보세요.
           </p>
           
           {/* CTA 버튼들 */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/posts"
-              className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all duration-200 shadow-md hover:shadow-lg"
+              className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-amber-500 px-8 py-3 text-sm font-medium text-white hover:bg-amber-600 transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              📚 블로그 글 읽기
+              🍜 세계 음식 둘러보기
             </Link>
             <Link
               href="/about"
-              className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg border border-input bg-background px-8 py-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:shadow-md"
+              className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg border border-input bg-background px-8 py-3 text-sm font-medium hover:bg-lime-100 hover:text-lime-900 transition-all duration-200 hover:shadow-md"
             >
-              👋 소개 보기
+              🌍 블로그 소개
             </Link>
           </div>
         </div>
@@ -156,12 +156,12 @@ export default async function Home() {
       <section className="mb-20">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">최신 게시물</h2>
+            <h2 className="text-3xl font-bold flex items-center gap-2">🍽️ 최신 음식 이야기</h2>
             <Link
               href="/posts"
-              className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
             >
-              모든 글 보기
+              모든 음식글 보기
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
@@ -229,9 +229,9 @@ export default async function Home() {
             <Card className="text-center py-12">
               <CardContent>
                 <div className="max-w-md mx-auto">
-                  <h3 className="text-lg font-semibold mb-2">아직 게시물이 없습니다</h3>
+                  <h3 className="text-lg font-semibold mb-2">아직 음식 이야기가 없습니다</h3>
                   <p className="text-muted-foreground mb-6">
-                    첫 번째 블로그 글을 작성해보세요!
+                    첫 번째 세계 음식 이야기를 남겨보세요!
                   </p>
                   
                   <SignedIn>
@@ -259,12 +259,12 @@ export default async function Home() {
       <section className="mb-20">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold">카테고리</h2>
+            <h2 className="text-3xl font-bold flex items-center gap-2">🌶️ 음식 카테고리</h2>
             <Link
               href="/categories"
-              className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
             >
-              모든 카테고리 보기
+              모든 음식 카테고리 보기
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
@@ -301,7 +301,7 @@ export default async function Home() {
             <Card className="text-center py-8">
               <CardContent>
                 <p className="text-muted-foreground">
-                  아직 카테고리가 없습니다.
+                  아직 음식 카테고리가 없습니다.
                 </p>
               </CardContent>
             </Card>

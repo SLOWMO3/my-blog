@@ -10,6 +10,7 @@ import PostCard from '@/components/blog/post-card';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import type { Metadata } from 'next';
 import { Database } from '@/types/database.types';
+import LikeButton from '@/components/blog/like-button'; // 경로 수정
 
 // 타입 정의
 type Post = Database['public']['Tables']['posts']['Row'];
@@ -276,7 +277,6 @@ async function PostsList({ searchParams }: { searchParams: any }) {
           .from('likes')
           .select('*', { count: 'exact', head: true })
           .eq('post_id', post.id);
-
         return {
           ...post,
           likeCount: likeCount || 0
@@ -507,10 +507,8 @@ async function PostsListContent({ searchParams }: { searchParams: any }) {
             {posts.map((post) => (
               <PostCard
                 key={post.id}
-                post={post}
-                showTags={true}
-                maxTags={3}
-                showCategory={category === 'all'}
+                post={{ ...post, likeCount: post.likeCount }}
+                showLikeButton={true}
               />
             ))}
           </div>
@@ -570,11 +568,11 @@ export default async function PostsPage({ searchParams }: PageProps) {
       {/* 페이지 헤더 */}
       <section className="text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Blog Posts
+          세계 음식 이야기
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          웹 개발, JavaScript, React, Next.js에 관한 모든 블로그 글을 확인해보세요. 
-          카테고리별로 필터링하거나 관심 있는 주제를 검색해보세요.
+          전 세계의 다양한 음식, 레시피, 음식 문화와 여행기를 한눈에 만나보세요.<br />
+          카테고리별로 필터링하거나, 궁금한 음식과 나라를 검색해보세요!
         </p>
       </section>
 
@@ -589,4 +587,4 @@ export default async function PostsPage({ searchParams }: PageProps) {
       </Suspense>
     </div>
   );
-} 
+}

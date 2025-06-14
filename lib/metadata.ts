@@ -359,5 +359,91 @@ export function generateSiteMetadata(): Metadata {
   };
 }
 
+/**
+ * 게시물별 동적 메타데이터 생성 (SEO, Open Graph, Twitter, JSON-LD)
+ * (중복 방지: 함수명을 generatePostMeta로 변경)
+ */
+export function generatePostMeta({
+  title,
+  content,
+  slug,
+  coverImageUrl,
+  createdAt,
+  updatedAt,
+  categoryName,
+  authorName = SITE_CONFIG.author.name,
+  excerpt,
+}: PostMetadataProps): Metadata & { jsonLd: any } {
+  const url = `${SITE_CONFIG.url}/posts/${slug}`;
+  const desc = excerpt || generateExcerpt(content, 150) || SITE_CONFIG.description;
+  const image = coverImageUrl || `${SITE_CONFIG.url}/default-og.png`;
+  // Open Graph
+  const openGraph = {
+    title,
+    description: desc,
+    url,
+    siteName: SITE_CONFIG.name,
+    type: 'article',
+    images: [
+      {
+        url: image,
+        width: 1200,
+        height: 630,
+        alt: title,
+      },
+    ],
+    publishedTime: createdAt,
+    modifiedTime: updatedAt,
+    authors: [authorName],
+    section: categoryName || '',
+  };
+  // Twitter Card
+  const twitter = {
+    card: 'summary_large_image',
+    title,
+    description: desc,
+    images: [image],
+    creator: SITE_CONFIG.social.twitter,
+  };
+  // JSON-LD 구조화 데이터
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: desc,
+    image,
+    url,
+    datePublished: createdAt,
+    dateModified: updatedAt,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_CONFIG.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_CONFIG.url}/default-og.png`,
+      },
+    },
+    mainEntityOfPage: url,
+  };
+  return {
+    title,
+    description: desc,
+    openGraph,
+    twitter,
+    alternates: { canonical: url },
+    other: {
+      'article:published_time': createdAt,
+      'article:modified_time': updatedAt,
+      'article:author': authorName,
+      'article:section': categoryName || '',
+    },
+    jsonLd,
+  };
+}
+
 // 상수 내보내기
 export { SITE_CONFIG };
