@@ -7,7 +7,7 @@ import type { Database } from '@/types/database.types';
 type Comment = Database['public']['Tables']['comments']['Row'];
 
 // 댓글 수정 (PUT)
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: any) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
 }
 
 // 댓글 삭제 (DELETE)
-export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: any) {
   try {
     const { userId } = await auth();
     if (!userId) {
